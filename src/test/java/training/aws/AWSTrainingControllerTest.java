@@ -38,4 +38,13 @@ class AWSTrainingControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().string("File hello_Jakub.txt uploaded to S3"));
   }
+
+  @Test
+  void getPresignedUrlReturnsServiceResult() throws Exception {
+    when(s3Service.generatePresignedUrl("Jakub")).thenReturn("https://example.com/presigned");
+
+    mockMvc.perform(get("/training/aws/s3/presigned-url").param("name", "Jakub"))
+        .andExpect(status().isOk())
+        .andExpect(content().string("https://example.com/presigned"));
+  }
 }
