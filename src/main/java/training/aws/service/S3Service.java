@@ -1,6 +1,7 @@
 package training.aws.service;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -14,18 +15,18 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 public class S3Service {
 
   private final S3Client s3Client;
-  private static final String BUCKET_NAME = "my-bucket-946298553912-eu-central-1-an";
+  private final String bucketName;
 
-  public S3Service() {
+  public S3Service(@Value("${aws.s3.bucket}") String bucketName) {
     this.s3Client = S3Client.builder().build();
+    this.bucketName = bucketName;
   }
-
   public String uploadFile(String name) {
     String fileName = "hello_" + name + ".txt";
     String content = "Hello " + name + "!";
 
     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-        .bucket(BUCKET_NAME)
+        .bucket(bucketName)
         .key("uploads/" + fileName)
         .build();
 
@@ -39,7 +40,7 @@ public class S3Service {
 
     try (S3Presigner presigner = S3Presigner.create()) {
       GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-          .bucket(BUCKET_NAME)
+          .bucket(bucketName)
           .key(fileName)
           .build();
 
